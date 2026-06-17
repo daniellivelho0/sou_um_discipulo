@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Discipulado</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --b1: #00AEEF;
+    --b2: #0090CC;
+    --b3: #006EA8;
+    --b4: #004F80;
+    --text: #0D2F45;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 10%, rgba(0,174,239,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at 90% 80%, rgba(0,144,204,0.15) 0%, transparent 60%),
+      linear-gradient(160deg, #dff3fc 0%, #f0f8fd 40%, #F5F1EB 100%);
+  }
+
+  .screen {
+    width: 100%;
+    max-width: 540px;
+    animation: fadeUp 0.35s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── COVER ── */
+  .cover-wrap { position: relative; }
+  .cover-wrap::before {
+    content: '';
+    position: absolute;
+    width: 340px; height: 340px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,174,239,0.22) 0%, transparent 70%);
+    top: -60px; left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .cover-card {
+    position: relative;
+    background: linear-gradient(150deg, var(--b1) 0%, var(--b2) 50%, var(--b3) 80%, var(--b4) 100%);
+    border-radius: 32px;
+    padding: 56px 36px 48px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0,110,168,0.25), 0 40px 80px rgba(0,80,128,0.2);
+    overflow: hidden;
+  }
+  .cover-card::before {
+    content: '';
+    position: absolute;
+    width: 280px; height: 180px;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.18) 0%, transparent 70%);
+    top: -40px; left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .cover-card h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 0.95;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+    position: relative;
+  }
+  .cover-pill {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 30px;
+    padding: 7px 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .cover-card p {
+    font-size: 0.98rem;
+    font-weight: 500;
+    line-height: 1.7;
+    opacity: 0.88;
+    margin-bottom: 36px;
+    position: relative;
+    max-width: 340px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .btn-start {
+    background: rgba(255,255,255,0.95);
+    color: var(--b3);
+    border: none;
+    border-radius: 12px;
+    padding: 14px 44px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    font-family: 'Barlow', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.22s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  }
+  .btn-start:hover { background: white; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.18); }
+
+  /* ── PROGRESS ── */
+  .progress-wrap { margin-bottom: 20px; padding: 0 2px; }
+  .progress-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--b3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .progress-track {
+    background: rgba(0,110,168,0.12);
+    border-radius: 20px;
+    height: 5px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--b1), var(--b3));
+    border-radius: 20px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 0 8px rgba(0,174,239,0.5);
+  }
+
+  /* ── QUESTION CARD ── */
+  .q-card {
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 24px;
+    border: 1.5px solid rgba(0,174,239,0.35);
+    padding: 28px 26px 22px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 24px rgba(0,110,168,0.08);
+  }
+  .q-label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: var(--b1);
+    margin-bottom: 10px;
+  }
+  .q-text {
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  /* ── OPTIONS ── */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .opt {
+    all: unset;
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    width: 100%;
+    background: rgba(255,255,255,0.65);
+    border: 1.5px solid rgba(255,255,255,0.85);
+    border-radius: 16px;
+    padding: 14px 18px 14px 48px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    font-family: 'Barlow', sans-serif;
+    line-height: 1.45;
+    transition: all 0.22s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 2px 12px rgba(0,80,128,0.06);
+  }
+  .opt::before {
+    content: '';
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,174,239,0.4);
+    background: transparent;
+    transition: all 0.2s;
+  }
+  .opt:hover {
+    background: rgba(255,255,255,0.9);
+    border-color: rgba(0,174,239,0.35);
+    transform: translateX(5px);
+    box-shadow: 0 4px 20px rgba(0,110,168,0.1);
+  }
+  .opt:hover::before {
+    border-color: var(--b1);
+    background: rgba(0,174,239,0.15);
+    box-shadow: 0 0 6px rgba(0,174,239,0.3);
+  }
+  .opt.flash {
+    background: rgba(0,174,239,0.12);
+    border-color: rgba(0,174,239,0.5);
+    color: var(--b3);
+    transform: translateX(5px);
+  }
+  .opt.flash::before {
+    background: var(--b1);
+    border-color: var(--b1);
+    box-shadow: 0 0 8px rgba(0,174,239,0.5);
+  }
+
+  /* ── BACK ── */
+  .btn-back {
+    all: unset;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    background: rgba(255,255,255,0.6);
+    border: 1.5px solid rgba(0,144,204,0.25);
+    border-radius: 10px;
+    padding: 9px 18px;
+    font-size: 0.83rem;
+    font-weight: 700;
+    color: var(--b2);
+    cursor: pointer;
+    font-family: 'Barlow', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-back:hover { background: rgba(255,255,255,0.85); border-color: var(--b1); transform: translateX(-2px); }
+
+  /* ── RESULT ── */
+  .result-hero {
+    position: relative;
+    border-radius: 28px;
+    padding: 44px 32px 38px;
+    text-align: center;
+    color: white;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,80,128,0.28), 0 0 80px rgba(0,174,239,0.15);
+  }
+  .result-hero::before {
+    content: '';
+    position: absolute;
+    width: 320px; height: 220px;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.2) 0%, transparent 65%);
+    top: -60px; left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .result-hero .medal { font-size: 52px; margin-bottom: 14px; position: relative; }
+  .result-hero .ring {
+    width: 92px; height: 92px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+    position: relative;
+  }
+  .result-hero .ring span { font-size: 1.65rem; font-weight: 900; }
+  .result-hero h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    position: relative;
+  }
+  .result-hero .sub { font-size: 0.88rem; font-weight: 600; opacity: 0.85; position: relative; }
+
+  .result-body {
+    position: relative;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 24px;
+    padding: 26px 24px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 24px rgba(0,80,128,0.08);
+  }
+  .result-body .desc {
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.72;
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .verse-box {
+    background: rgba(0,174,239,0.06);
+    border-left: 3px solid var(--b1);
+    border-radius: 0 10px 10px 0;
+    padding: 13px 16px;
+    font-size: 0.86rem;
+    color: var(--b3);
+    font-style: italic;
+    font-weight: 700;
+    line-height: 1.6;
+  }
+
+  .btn-restart {
+    all: unset;
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: linear-gradient(135deg, var(--b1) 0%, var(--b3) 100%);
+    color: white;
+    border-radius: 14px;
+    padding: 15px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    font-family: 'Barlow', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.22s;
+    box-shadow: 0 6px 20px rgba(0,80,128,0.25), 0 0 24px rgba(0,174,239,0.15);
+  }
+  .btn-restart:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,80,128,0.3); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const Qs = [
+  { q: "Quando alguém te machuca ou age mal com você, qual é sua reação mais comum?", opts: [
+    { t: "Guardo rancor e fico distante", p: 0 },
+    { t: "Fico magoado, mas com o tempo tento perdoar", p: 2 },
+    { t: "Busco entender e perdoar logo, como Cristo perdoou", p: 4 },
+    { t: "Oro pela pessoa e busco a reconciliação ativamente", p: 5 }
+  ]},
+  { q: "Como está sua perseverança na fé nos momentos mais difíceis?", opts: [
+    { t: "Quando as coisas ficam difíceis, me afasto da fé", p: 0 },
+    { t: "Vacilo bastante, mas volto depois de um tempo", p: 2 },
+    { t: "Me mantenho firme, embora com muitas lutas internas", p: 4 },
+    { t: "As dificuldades me aproximam ainda mais de Cristo", p: 5 }
+  ]},
+  { q: "Com que sinceridade você coloca Cristo acima de tudo na sua vida?", opts: [
+    { t: "Sinceramente, ainda priorizo muita coisa antes d'Ele", p: 0 },
+    { t: "Tento, mas outras coisas frequentemente ganham prioridade", p: 2 },
+    { t: "Na maioria das vezes, Cristo é a minha prioridade", p: 4 },
+    { t: "Busco viver cada dia com Ele em primeiro lugar de verdade", p: 5 }
+  ]},
+  { q: "Como você demonstra amor fraternal pelos irmãos da sua comunidade?", opts: [
+    { t: "Não costumo me envolver com os problemas dos outros", p: 0 },
+    { t: "Ajudo quando alguém pede, mas não tomo iniciativa", p: 2 },
+    { t: "Estou atento às necessidades e busco ajudar com frequência", p: 4 },
+    { t: "O amor pelos irmãos é uma prática diária e intencional", p: 5 }
+  ]},
+  { q: "Você compartilha o evangelho com pessoas que ainda não conhecem Cristo?", opts: [
+    { t: "Não — tenho muita dificuldade ou não me sinto chamado", p: 0 },
+    { t: "Raramente, me sinto inseguro ou com medo do julgamento", p: 2 },
+    { t: "Às vezes, quando surge uma oportunidade clara", p: 3 },
+    { t: "Sim, porque não consigo esconder o que vivo com Ele", p: 5 }
+  ]},
+  { q: "Os frutos da sua vida cristã são visíveis para quem está ao seu redor?", opts: [
+    { t: "Provavelmente não — minha vida não reflete muito minha fé", p: 0 },
+    { t: "Às vezes sim, mas ainda há muita inconsistência", p: 2 },
+    { t: "As pessoas próximas percebem uma diferença em mim", p: 4 },
+    { t: "Meu modo de viver é um testemunho constante de Cristo", p: 5 }
+  ]},
+  { q: "Você busca ser transformado por Cristo ou prefere permanecer como está?", opts: [
+    { t: "Honestamente, tenho resistência a mudanças profundas", p: 0 },
+    { t: "Quero mudar, mas não tenho buscado isso de forma consistente", p: 2 },
+    { t: "Estou em processo de transformação e isso me anima muito", p: 4 },
+    { t: "Me lanço aos pés de Cristo buscando ser moldado cada vez mais", p: 5 }
+  ]},
+  { q: "Como você se comporta fora da Igreja — no trabalho, em casa, no dia a dia?", opts: [
+    { t: "Tenho um jeito bem diferente de como sou dentro da Igreja", p: 0 },
+    { t: "Tento manter, mas em casa ou no trabalho acabo deslizando", p: 2 },
+    { t: "Me esforço para ser consistente, embora nem sempre consiga", p: 4 },
+    { t: "Vivo o evangelho em todos os ambientes sem separação", p: 5 }
+  ]}
+];
+
+const RESULTS = [
+  { min: 0.85, medal: "👑", title: "Um Escolhido de Jesus", sub: "Marcas genuínas de discípulo",
+    bg: "linear-gradient(150deg, #00AEEF 0%, #006EA8 60%, #004F80 100%)",
+    desc: "Sua vida é um reflexo do Mestre. Sinceridade, perseverança, amor fraternal e frutificação estão presentes de forma clara. Continue aberto à transformação contínua — mesmo os mais maduros têm sempre mais a crescer em Cristo.",
+    verse: "\"Quando vocês produzem muitos frutos, trazem grande glória a meu Pai e demonstram que são meus discípulos de verdade.\" — João 15.8" },
+  { min: 0.65, medal: "🌱", title: "Seguidor em Crescimento", sub: "No caminho certo, sendo moldado",
+    bg: "linear-gradient(150deg, #00AEEF 0%, #0090CC 55%, #006EA8 100%)",
+    desc: "Como os discípulos que Jesus escolheu — imperfeitos, mas dispostos — você está sendo moldado. Não desanime com as inconsistências. Cristo não escolheu os perfeitos; Ele transforma os que se permitem ser transformados. Continue firme.",
+    verse: "\"Persevere... olhando para Jesus, o autor e consumador da nossa fé.\" — Hebreus 12.1-2" },
+  { min: 0.40, medal: "⚓", title: "Há Semente, Falta Raiz", sub: "A base existe — é hora de aprofundar",
+    bg: "linear-gradient(150deg, #0090CC 0%, #006EA8 55%, #004F80 100%)",
+    desc: "Existe uma base de fé, mas algumas marcas do discipulado precisam ser cultivadas com mais intenção. A boa notícia: Cristo usa pessoas comuns. Avalie as áreas mais fracas, leve-as em oração e deixe-se encontrar por Ele.",
+    verse: "\"Não vim chamar os justos, mas pecadores.\" — Marcos 2.17" },
+  { min: 0, medal: "🕊️", title: "Um Convite Aberto", sub: "Todo começo começa com um encontro",
+    bg: "linear-gradient(150deg, #006EA8 0%, #004F80 100%)",
+    desc: "Talvez este quiz tenha revelado um distanciamento entre onde você está e onde Cristo quer que você chegue — e isso é um presente. Jesus não escolheu os discípulos pelo que eram, mas pelo que poderiam se tornar. O chamado ainda está aberto para você.",
+    verse: "\"Vinde a mim, todos os que estais cansados e sobrecarregados, e eu vos aliviarei.\" — Mateus 11.28" }
+];
+
+let phase = "cover", cur = 0;
+let answers = new Array(Qs.length).fill(null);
+let total = 0;
+
+const getResult = () => RESULTS.find(r => (total / (Qs.length * 5)) >= r.min);
+
+function render() {
+  const app = document.getElementById('app');
+  if (phase === "cover") {
+    app.innerHTML = `
+      <div class="screen">
+        <div class="cover-wrap">
+          <div class="cover-card">
+            <h1>SOU UM<br>DISCÍPULO?</h1>
+            <div class="cover-pill">Capítulo 17 · Discipulado</div>
+            <p>8 perguntas para refletir sobre sua caminhada como discípulo de Cristo. Responda com sinceridade — não há resposta certa ou errada, apenas verdadeira.</p>
+            <button class="btn-start" onclick="startQuiz()">Começar →</button>
+          </div>
+        </div>
+      </div>`;
+  } else if (phase === "quiz") {
+    const q = Qs[cur];
+    const pct = (cur / Qs.length) * 100;
+    app.innerHTML = `
+      <div class="screen">
+        <div class="progress-wrap">
+          <div class="progress-top"><span>Pergunta ${cur+1} de ${Qs.length}</span><span>${Math.round(pct)}%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="q-card">
+          <div class="q-label">Pergunta ${cur+1}</div>
+          <div class="q-text">${q.q}</div>
+        </div>
+        <div class="options">
+          ${q.opts.map((o,i) => `<button class="opt" onclick="pick(${i})">${o.t}</button>`).join('')}
+        </div>
+        ${cur > 0 ? `<button class="btn-back" onclick="goBack()">← Voltar</button>` : ''}
+      </div>`;
+  } else {
+    const r = getResult();
+    const pct = Math.round((total / (Qs.length * 5)) * 100);
+    app.innerHTML = `
+      <div class="screen">
+        <div class="result-hero" style="background:${r.bg}">
+          <div class="medal">${r.medal}</div>
+          <div class="ring"><span>${pct}%</span></div>
+          <h2>${r.title}</h2>
+          <div class="sub">${r.sub}</div>
+        </div>
+        <div class="result-body">
+          <div class="desc">${r.desc}</div>
+          <div class="verse-box">${r.verse}</div>
+        </div>
+        <button class="btn-restart" onclick="restart()">↩ Fazer novamente</button>
+      </div>`;
+  }
+}
+
+function startQuiz() { phase="quiz"; cur=0; answers=new Array(Qs.length).fill(null); total=0; render(); }
+
+function pick(i) {
+  const btns = document.querySelectorAll('.opt');
+  btns[i].classList.add('flash');
+  setTimeout(() => {
+    total += Qs[cur].opts[i].p;
+    answers[cur] = i;
+    cur++;
+    if (cur >= Qs.length) phase = "result";
+    render();
+  }, 260);
+}
+
+function goBack() {
+  total -= Qs[cur-1].opts[answers[cur-1]].p;
+  answers[cur-1] = null;
+  cur--;
+  render();
+}
+
+function restart() { phase="cover"; render(); }
+
+render();
+</script>
+</body>
+</html>
